@@ -1,0 +1,47 @@
+version: '3.8'
+
+services:
+  app:
+    build: .
+    container_name: filmpro-api
+    restart: always
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./app:/app/app
+      - script-uploads:/app/uploads
+    environment:
+      - DEBUG=True
+      - SECRET_KEY=temporarysecretkeyreplacewithrandomvalueforproduction
+      - MONGO_URI=mongodb://mongo:27017/
+      - MONGO_DB_NAME=filmpro
+      - SCRIPT_UPLOAD_DIR=/app/uploads
+      - LOG_LEVEL=INFO
+    depends_on:
+      - mongo
+      - redis
+
+  mongo:
+    image: mongo:6.0
+    container_name: filmpro-mongo
+    restart: always
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+    environment:
+      - MONGO_INITDB_DATABASE=filmpro
+
+  redis:
+    image: redis:7.0-alpine
+    container_name: filmpro-redis
+    restart: always
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+
+volumes:
+  mongo-data:
+  redis-data:
+  script-uploads:
